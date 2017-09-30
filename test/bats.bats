@@ -300,3 +300,11 @@ fixtures bats
   [ "${lines[2]}" = "ok 2 double-quoted name" ]
   [ "${lines[3]}" = "ok 3 unquoted name" ]
 }
+
+@test "duplicate tests cause a warning on stderr" {
+  run bats "$FIXTURE_ROOT/duplicate-tests.bats"
+  [ $status -eq 1 ]
+  case "${lines[0]}" in
+    "bats warning: duplicate test name(s) in /"*": test_gizmo_test " ) true ;; * ) false ;; esac
+  [ "${#lines[*]}" = "7" ]
+}
