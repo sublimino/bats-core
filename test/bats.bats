@@ -278,7 +278,7 @@ fixtures bats
   [ "${lines[3]}" =  'ok 3 input redirection' ]
   [ "${lines[4]}" =  'not ok 4 failing' ]
   [ "${lines[5]}" =  "# (in test file $RELATIVE_FIXTURE_ROOT/single_line.bats, line 9)" ]
-  [ "${lines[6]}" = $'#   `@test "failing" { false; }\' failed' ]
+  [ "${lines[6]}" = $'#   `@test "failing" {false;}\' failed' ]
 }
 
 @test "testing IFS not modified by run" {
