@@ -311,3 +311,11 @@ fixtures bats
   [ "${lines[5]}" = 'ok 5 tabs at beginning of line and before description' ]
   [ "${lines[6]}" = 'ok 6 tabs at beginning, before description, before brace' ]
 }
+
+@test "enforce nonempty test name" {
+  run bats "$FIXTURE_ROOT/empty_name.bats"
+  [ "$status" -eq '1' ]
+  [ "${lines[0]}" == 'line 1: test case name must not be empty' ]
+  [ "${lines[1]}" == 'line 2: test case name must not be empty' ]
+  [ "${lines[2]}" == 'line 3: test case name must not be empty' ]
+}
