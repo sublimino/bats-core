@@ -300,3 +300,11 @@ fixtures bats
   [ "${lines[2]}" = "ok 2 double-quoted name" ]
   [ "${lines[3]}" = "ok 3 unquoted name" ]
 }
+
+@test "ensure double bracket expressions fail as necessary" {
+  run bats "$FIXTURE_ROOT/double_brackets.bats"
+  [ "$status" -eq '1' ]
+  [ "${lines[1]}" == 'not ok 1 double bracket returns false' ]
+  [ "${lines[2]}" == "# (in test file $RELATIVE_FIXTURE_ROOT/double_brackets.bats, line 4)" ]
+  [ "${lines[3]}" == "#   \`[[ \"\$value\" == 'false' ]]' failed" ]
+}
