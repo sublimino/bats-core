@@ -7,7 +7,7 @@ encode_name() {
   local hex_code
 
   if [[ "$name" =~ ^[[:space:]]*(.*)[[:space:]]*$ ]]; then
-    printf -v 'name' -- '%s' "${BASH_REMATCH[1]}"
+    name="${BASH_REMATCH[1]}"
   fi
 
   if [[ -z "$name" ]]; then
