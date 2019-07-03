@@ -34,6 +34,11 @@ bats_encode_test_name() {
 test_file="$1"
 tests=()
 
+IS_CASE_INSENSITIVE_FILTER=0
+if [[ ! "${BATS_TEST_FILTER}" =~ [A-Z]+ ]]; then
+  IS_CASE_INSENSITIVE_FILTER=1
+fi
+
 {
   while IFS= read -r line; do
     line="${line//$'\r'}"
@@ -44,8 +49,20 @@ tests=()
       bats_encode_test_name "$name" 'encoded_name'
       printf '%s() { bats_test_begin "%s"; %s\n' "$encoded_name" "$name" "$body" || :
 
-      if [[ -z "$BATS_TEST_FILTER" || "$name" =~ $BATS_TEST_FILTER ]]; then
+      if [[ -z "${BATS_TEST_FILTER}" ]]; then
         tests+=("$encoded_name")
+
+      else
+        if [[ "${IS_CASE_INSENSITIVE_FILTER}" == 1 ]]; then
+          shopt -s nocasematch
+          if [[ "$name" =~ $BATS_TEST_FILTER ]]; then
+            tests+=("$encoded_name")
+          fi
+          shopt -u nocasematch
+
+        elif [[ "$name" =~ $BATS_TEST_FILTER ]]; then
+          tests+=("$encoded_name")
+        fi
       fi
     else
       printf '%s\n' "$line"
