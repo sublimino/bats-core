@@ -54,20 +54,34 @@ main() {
   cat <<EOF
 # To complete the release:
 
-git commit -m "feat: release Bats ${NEW_BATS_VERSION}"
+1. Manually edit the CHANGELOG diffs in docs/CHANGELOG.md
 
-git tag -a -s "${NEW_BATS_VERSION}"
-# Include the docs/CHANGELOG.md notes corresponding to the new version as the
-# tag annotation, except the first line should be: Bats ${NEW_BATS_VERSION} - $(date +%Y-%m-%d)
-# and any Markdown headings should become plain text
+2. Commit the changes
+
+git commit -m "feat: release Bats v${NEW_BATS_VERSION}"
+
+3. Generate the changelog, and tag the release
+# changelog start
+EOF
+
+local DELIM=$(echo -en "\001");
+sed -E -n "\\${DELIM}^## \[${NEW_BATS_VERSION}\]${DELIM},\\${DELIM}^## ${DELIM}p" docs/CHANGELOG.md \
+  | sed -E \
+    -e 's,^## \[([0-9\.]+)] - (.*),Bats \1\n\nReleased: \2,' \
+    -e 's,^### (.*),\1:,g' \
+  | head -n -2 | tee /tmp/bats-release
+
+  cat <<EOF
+# changelog end. Copy the output into the tag notes
+git tag -a -s "v${NEW_BATS_VERSION}" --message /tmp/bats-release
+
+4. Push the changes
 
 git push --follow-tags
 
-# navigate to https://github.com/bats-core/bats-core/releases and follow
-# instuctions in docs/releasing.md
-# - Name the release: Bats ${NEW_BATS_VERSION}
-# - Paste the same notes from the version tag annotation as the description,
-#   except change the first line to read: Released: $(date +%Y-%m-%d).
+5. Use Github hub to make a draft release
+
+hub release create "v${NEW_BATS_VERSION}" --draft --file /tmp/bats-release.txt
 EOF
 
   exit 0
